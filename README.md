@@ -24,6 +24,7 @@
 | [🐤 **Flappy Bird**](flappybird/description.md) | 🎮 Game | Flappy Bird clone with animated bird, scrolling scenery, medals and rising difficulty |
 | [🌾 **Golden Realm**](goldenrealm/description.md) | 🎮 Game | Cozy farming speedrun through golden fields and green valleys, with wind, smoke and butterflies |
 | [🧱 **Tetris**](tetris/description.md) | 🎮 Game | Classic Tetris with ghost piece, next preview, wall kicks and levels |
+| [🟥 **Rubix**](rubix/description.md) | 🛠️ Tool | 3D Rubik's cube solver for 2×2 and 3×3 with animated turns, plus a speedcubing timer with averages |
 | [🧩 **Template**](template/description.md) | 🛠️ Starter | Blank starting point for a new program: copy it and rename |
 
 Each program has its own folder containing the code and a `description.md` that explains what it does and how to use it.
@@ -52,8 +53,12 @@ CG100-Tools/
 ├── goldenrealm/
 │   ├── goldenrealm.py
 │   └── description.md
-└── tetris/
-    ├── tetris.py
+├── tetris/
+│   ├── tetris.py
+│   └── description.md
+└── rubix/
+    ├── rubix.py
+    ├── rubixtimer.py
     └── description.md
 ```
 

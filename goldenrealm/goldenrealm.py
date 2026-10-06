@@ -102,7 +102,7 @@ def world():
   for n in range(90):blob(rn(WX),rn(WY),1,"f",2)
   for n in range(3):blob(8+rn(80),8+rn(40),1+rn(2),"W",4)
   x=34
-  for y in range(42):   # river: south from the hills, then east to the fjord
+  for y in range(42):   # river: south from the hills, then east to the sea
     put(x,y,'W');put(x+1,y,'W');x+=rn(3)-1;x=28 if x<28 else 40 if x>40 else x
   y=40;z.fd=[]
   for i in range(x,WX):
@@ -120,7 +120,7 @@ def world():
     for a in range(-1,6):
       for b in range(-1,4):put(cx+a,cy+b,'h' if a>=0 and a<4 and b<2 else ('D' if a==1 else 'H') if a>=0 and a<4 and b==2 else 'Y' if a==5 and b==1 else '.')
   xs=104
-  for y in range(WY):   # fjord and beach
+  for y in range(WY):   # sea and beach
     put(xs-2,y,'b');put(xs-1,y,'b')
     for x in range(xs,WX):put(x,y,'W')
     xs+=rn(3)-1;xs=100 if xs<100 else 107 if xs>107 else xs

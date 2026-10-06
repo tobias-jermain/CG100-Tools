@@ -60,6 +60,7 @@ Use [`template/description.md`](template/description.md) as the starting point, 
 
 - Keep programs to **300 lines or fewer**, which is the fx-CG100 limit.
 - Target **MicroPython 1.9.4** with `casioplot` on the **Casio fx-CG100**. Avoid newer Python features.
+- The calculator's Python is missing some things. Programs run so far avoid `bytearray`, `max`, `int()`, floats, `//`, `.items()` and `.pop()`. Use plain lists, loops and `min`, or write a small helper, as `flappybird.py` does.
 - Put a comment on the first line saying what the program is and how to control it.
 - Memory is tight, so short names and compact code are fine. Comment anything that isn't obvious.
 - Put adjustable settings (speed, colours and so on) as constants near the top of the file.

@@ -46,12 +46,12 @@ Standard colours: white top, green front, red right, yellow bottom, orange left,
 ### Settings
 
 ```python
-ST=2;SA=0;SL=(11,20);HI=300
+ST=3;SA=0;SL=(11,20);HI=300
 ```
 
 | Setting | What it does |
 |---|---|
-| `ST` | Animation step. `1` is smoothest (6 frames per quarter turn), `2` is the default, `3` is faster and `6` jumps straight to the end of each turn. |
+| `ST` | Animation step. `3` (default) draws 2 frames per quarter turn, `2` draws 3 (smoother), `1` draws 6 (smoothest) and `6` jumps straight to the end of each turn. |
 | `SA` | `1` animates the scramble too. `0` (default) scrambles instantly. |
 | `SL` | Scramble length for the 2×2 and the 3×3. |
 | `HI` | Pause between turns of the cube on the home screen. Bigger is calmer. |
@@ -59,7 +59,12 @@ ST=2;SA=0;SL=(11,20);HI=300
 ### Notes
 
 - Working out a 3×3 solution takes a few seconds on the calculator. `SOLVING: ...` shows which step it's on.
-- `set_pixel` is the slow part, so stickers are drawn with thin outlines rather than black tiles, and the screen is cleared with `clear_screen()` between frames.
+- `set_pixel` is the slow part, so the cube is drawn in a way that sets as few pixels as possible:
+  - Each frame is first built in memory as runs of colour along each screen row, with nearer surfaces drawn over farther ones.
+  - That frame is compared with the one already on screen, and only the pixels that changed are set. While a layer turns, only it and the part it uncovers get redrawn.
+  - The rest of the cube is built once per turn and reused for every frame of that turn.
+  - The flat net, the step text and the bottom menu only redraw the parts that changed. The screen is never cleared during a turn.
+  - Compared with the first version, each frame of a turn sets about 4× fewer pixels (about 8,000 instead of 31,700). With 2 frames per turn instead of 3, a whole turn sets about 6× fewer. The home screen's turning cube sets about 9× fewer per frame.
 
 ## ⏱️ Rubix Timer
 

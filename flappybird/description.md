@@ -39,7 +39,7 @@ Each press is one flap. Holding the key does nothing extra.
 Two settings sit at the top of the file:
 
 ```python
-SPD=800;MS=1
+SPD=0;MS=1
 ```
 
 | Setting | What it does |
@@ -47,7 +47,7 @@ SPD=800;MS=1
 | `SPD` | Extra delay added every frame. Bigger is slower, `0` is no extra delay. |
 | `MS` | Moves the pipes and ground every `MS` frames instead of every frame. `2` or `3` is lighter on the calculator but looks steppier. |
 
-Flappy Bird redraws more of the screen each frame than PAC-MAN does. On a PC simulation it wrote about 2,000–3,000 pixels per frame, against about 500 for PAC-MAN. If it feels choppy, try `SPD=0` and then `MS=2`. If it is too fast, raise `SPD`. These values have not been tested on a real calculator, so adjust them to suit yours.
+Flappy Bird redraws more of the screen each frame than PAC-MAN does, so it is tuned to do as little as possible. `SPD=0` is the fastest. If it is too fast, raise `SPD` until it feels right. If it is still too slow, try `MS=2`. These values have not been tested on a real calculator, so adjust them to suit yours.
 
 Other values you can change:
 
@@ -58,9 +58,20 @@ Other values you can change:
 | `SP` | Distance between pipes in pixels |
 | `W`, `H` | Canvas size (384×192 for `casioplot`) |
 
+## Speed
+
+The drawing code is built to touch as few pixels as it can, and to spend as little time as possible between pixels.
+
+- **Pipes** repaint only the pixels that change. Each pipe edge is looked up in a small table, so only the few columns that change are visited, and rows that already have the right colour are skipped.
+- **Bird** erases only the pixels it just left, instead of the whole box around it. It falls back to a full restore only when it is next to a pipe cap, the hills or a cloud.
+- **Ground** works out each stripe's colour once instead of once per column.
+- **Hot loops** keep `set_pixel` in a local variable and avoid helper calls and temporary lists, which MicroPython is slow at.
+
+On MicroPython 1.9.4 on a PC this takes about 2.9 times less time per frame than the first version (292 µs against 863 µs), with 2.1 times fewer bytecodes and 1.35 times fewer pixel writes. Every frame is pixel-for-pixel identical to the first version, so the graphics are unchanged. The speed-up on the calculator has not been measured.
+
 ## How it works
 
-- **Smooth drawing:** each frame only the columns that changed are repainted. A moving pipe repaints its two edge columns and the strip it just left.
+- **Smooth drawing:** each frame only the pixels that changed are repainted. A moving pipe repaints its two edge columns and the strip it just left.
 - **Background restore:** a single `col()` function redraws any column of sky, clouds, hills and pipes, and the bird, panel and text erasing all use it.
 - **Fixed-point physics:** position and speed are stored in 1/16 pixels, so no floating point is used per frame.
 

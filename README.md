@@ -24,6 +24,7 @@
 | [🐤 **Flappy Bird**](flappybird/description.md) | 🎮 Game | Flappy Bird clone with animated bird, scrolling scenery, medals and rising difficulty |
 | [🌾 **Golden Realm**](goldenrealm/description.md) | 🎮 Game | Cozy farming speedrun through golden fields and green valleys, with wind, smoke and butterflies |
 | [🧱 **Tetris**](tetris/description.md) | 🎮 Game | Classic Tetris with ghost piece, next preview, wall kicks and levels |
+| [⚡ **Circuit Solver**](circuitsolver/description.md) | 🛠️ Tool | Build DC circuits and get every current, voltage and power as exact fractions, with animated current flow |
 | [🎬 **Video Player**](video/description.md) | 🛠️ Tool | Plays short, blocky colour clips made from a GIF with the included PC converter |
 | [🧩 **Template**](template/description.md) | 🛠️ Starter | Blank starting point for a new program: copy it and rename |
 
@@ -56,6 +57,8 @@ CG100-Tools/
 ├── tetris/
 │   ├── tetris.py
 │   └── description.md
+└── circuitsolver/
+    ├── circuitsolver.py
 └── video/
     ├── video.py
     ├── mkvideo.py

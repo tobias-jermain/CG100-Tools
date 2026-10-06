@@ -20,14 +20,19 @@ WF=(1,0,1,2)
 class Z:pass
 z=Z();z.hi=0;z.pn=0;z.oy=90;z.pp=[];z.go=0
 def bs(t):
-  d={}
+  g=[]
   for j in range(BT):
+    g.append([None]*BW)
     for i in range(BW):
-      if BR[j][i]!='.':d[(i,j)]=BP[BR[j][i]]
+      if BR[j][i]!='.':g[j][i]=BP[BR[j][i]]
   for j in range(3):
     for i in range(BW):
-      if WG[j][i]!='.':d[(i,t+j)]=BP[WG[j][i]]
-  return [(i,j,c) for (i,j),c in d.items()]
+      if WG[j][i]!='.':g[t+j][i]=BP[WG[j][i]]
+  r=[]
+  for j in range(BT):
+    for i in range(BW):
+      if g[j][i]!=None:r.append((i,j,g[j][i]))
+  return r
 BS=[bs(2),bs(4),bs(6)]
 BH=bytearray(W);CT=bytearray(W);CB=bytearray(W)
 for x in range(W):BH[x]=5+int((256-((x%32)-16)**2)**0.5*0.65)
@@ -74,7 +79,7 @@ def rest(x0,x1,y0,y1):
 def kc(c):return -1 if c<0 or c>=CW else c if c<2 or c>=CW-2 else 2
 def mv(v):
   for p in z.pp:
-    xo=p[0];p[0]=xn=xo-v
+    xo=p[0];xn=xo-v;p[0]=xn
     for x in range(max(0,xn),min(W,xo+CW)):
       if kc(x-xn)!=kc(x-xo):pa(x,cs(x,p,0),0,H)
 def gnd(o,s):

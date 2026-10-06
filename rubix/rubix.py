@@ -1,20 +1,22 @@
 # RUBIX for Casio fx-CG100 (MicroPython 1.9.4, casioplot): 3D 2x2 / 3x3 cube with a solver.
-# LEFT/RIGHT = pick, UP/EXE = turn clockwise or do, DOWN = turn anticlockwise, EXE skips a solve, AC = quit.
+# Home: UP/DOWN = choose, EXE = open. Cube: LEFT/RIGHT = pick, UP/EXE = turn clockwise or do, DOWN = anticlockwise, AC = quit.
 from casioplot import *
 from random import randint
-ST=2;SA=0;SL=(11,20)
-# ST = animation step (1 smoothest, 2, 3 or 6 fastest), SA = 1 animates scrambles, SL = 2x2/3x3 scramble lengths
-W=384;H=192;BK=(0,0,0);WH=(255,255,255);TX=(30,34,60);GY=(110,114,140);HL=(255,196,40)
+ST=2;SA=0;SL=(11,20);HI=300
+# ST = animation step (1 smoothest, 2, 3 or 6 fastest), SA = 1 animates scrambles, SL = 2x2/3x3 scramble lengths,
+# HI = pause between turns of the cube on the home screen
+W=384;H=192;BK=(0,0,0);WH=(255,255,255);TX=(30,34,60);GY=(110,114,140);HL=(255,196,40);PL=(242,244,250);LN=(222,226,238)
 CO=((255,255,255),(214,30,30),(20,160,70),(250,214,0),(255,124,0),(24,78,214))   # U R F D L B
 FA="URFDLB";AX=(1,0,2,1,0,2);SG=(1,1,1,-1,-1,-1)
 VR=(196,0,-165);VU=(-82,222,-98);VD=(143,128,170)   # screen right, screen up, towards you (x256)
 CS=(256,247,222,181,128,66,0)   # cos of 0,15..90 degrees (x256)
 CX=100;CY=88
 YR={"F":"R","R":"B","B":"L","L":"F"}   # turn the cube a quarter about U: slot FR -> RB -> BL -> LF
-IT=("U","R","F","D","L","B","MIX","SOLVE","SIZE","RESET")
+IT=("U","R","F","D","L","B","MIX","SOLVE","RESET","HOME")
+HM=(("3X3 CUBE","Scramble, turn and solve",2),("2X2 CUBE","The pocket cube",1),("HOW TO","Controls and tips",5))
 SN=("CROSS","1ST LAYER","2ND LAYER","EDGE FLIP","CORNER TWIST","CORNER SWAP","EDGE SWAP")
 class Z:pass
-z=Z();z.lk=0;z.sel=0;z.sol=[];z.msg="";z.ms=[];z.mi=0;z.st=-1
+z=Z();z.lk=0;z.sel=0;z.hm=0;z.sol=[];z.msg="";z.ms=[];z.mi=0;z.st=-1
 def dv(a,b):   # a/b without // (binary long division)
   q=0;k=0
   while (b<<(k+1))<=a:k+=1
@@ -26,16 +28,10 @@ RC=[0]+[dv(65536,v) for v in range(1,200)]
 def rc(x,y,w,h,c):
   for j in range(y,y+h):
     for i in range(x,x+w):set_pixel(i,j,c)
-def rot(v,a):   # +90 degrees about axis a
-  x,y,w=v
-  if a==0:return [x,-w,y]
-  if a==1:return [w,y,-x]
-  return [-y,x,w]
+def rot(v,a):x,y,w=v;return ([x,-w,y],[w,y,-x],[-y,x,w])[a]   # +90 degrees about axis a
 def cmp(a,b):return [b[a[i]] for i in range(len(a))]   # map a then map b
 def mp(s):   # "R U2 R'" -> move numbers (face*3 + quarter turns-1)
-  r=[]
-  for t in s.split():r.append(FA.find(t[0])*3+(1 if t[-1]=="2" else 2 if t[-1]=="'" else 0))
-  return r
+  return [FA.find(t[0])*3+(1 if t[-1]=="2" else 2 if t[-1]=="'" else 0) for t in s.split()]
 def nm(m):
   f=0
   while m>=3:m-=3;f+=1
@@ -67,8 +63,7 @@ def build(n):
   ce=[]
   for i in range(T):   # stickers on the same piece share a centre
     c=list(P[i]);c[AX[z.F[i]]]=SG[z.F[i]]*(n-1);c=tuple(c);ce.append(c)
-    if c not in cb:cb[c]=[]
-    cb[c].append(i)
+    cb[c]=cb.get(c,[])+[i]
   z.CU=[cb[c] for c in ce]
   z.HK=[key(z.C,i) for i in range(T)]
   z.Q=[[c*z.S for c in p] for p in P]
@@ -94,10 +89,7 @@ def build(n):
     "R2 D R' U2 R D' R' U2 R'","R U R' U' R' F R F'","F R' F' R U R U' R'")]   # twist corners (Sune, H, Pi, U, T, L)
   z.AN=U3+[ent(yr(s,k)) for k in range(4) for s in ("R' F R' B2 R F' R' B2 R2","R2 B2 R F R' B2 R F' R")]   # A-perms
   z.AP=U3+[ent(yr(s,k)) for k in range(4) for s in ("R U' R U R U R U' R' U' R2","R2 U R U R' U' R' U' R' U R'")]   # U-perms
-def key(c,i):
-  k=0
-  for q in z.CU[i]:k+=1<<c[q]
-  return k
+def key(c,i):return sum([1<<c[q] for q in z.CU[i]])
 def app(c,m):
   r=[0]*z.T
   for i in range(z.T):r[m[i]]=c[i]
@@ -106,10 +98,7 @@ def find(c,h):
   for p in range(z.T):
     if c[p]==z.F[h] and key(c,p)==z.HK[h]:return p
 def dfs(ps,G,A,d,l):
-  if d==0:
-    for i in range(len(ps)):
-      if ps[i] not in G[i]:return 0
-    return 1
+  if d==0:return all([ps[i] in G[i] for i in range(len(ps))])
   for e in A:
     if e[1]>=0 and (e[1]==l or e[1]+3==l):continue   # same face twice, or opposite faces both ways
     m=e[0]
@@ -142,12 +131,9 @@ def add(m,si):   # append a move, merging turns of the same face
   else:s.append((m,si))
 def solve():
   z.W=list(z.C);z.sol=[];z.dn=[];z.msg="";bar("SOLVING...")
-  if z.n==3:
-    pcs(z.DE,z.A18,5,0,"CROSS")
+  if z.n==3:pcs(z.DE,z.A18,5,0,"CROSS")
   pcs(z.DC,z.AC,3,1,"CORNERS")
-  if z.n==3:
-    pcs(z.ME,z.AE,3,2,"EDGES")
-    bar("SOLVING: LAST LAYER");stage([(h,tuple(z.UE)) for h in z.UE],z.AO,5,3)
+  if z.n==3:pcs(z.ME,z.AE,3,2,"EDGES");bar("SOLVING: LAST LAYER");stage([(h,tuple(z.UE)) for h in z.UE],z.AO,5,3)
   bar("SOLVING: LAST LAYER");stage([(h,tuple(z.UE)) for h in z.UE]+[(h,tuple(z.UC)) for h in z.UC],z.AT,5,4)
   stage([(h,(h,)) for h in z.UC],z.AN,3,5);z.dn+=z.UC
   if z.n==3:stage([(h,(h,)) for h in z.UE],z.AP,3,6)
@@ -166,13 +152,9 @@ def fill(p,col,sp=set_pixel):   # convex quad
     d=y1-y0;k=(x1-x0)*RC[d]
     for y in range(y0,y1+1):
       x=x0+(((y-y0)*k+32768)>>16) if d else x0;j=y-t
-      if x<L[j]:L[j]=x
-      if x>R[j]:R[j]=x
-      if d==0 and x1>R[j]:R[j]=x1
-      if d==0 and x1<L[j]:L[j]=x1
-  for j in range(b-t+1):
-    y=t+j
-    for x in range(L[j],R[j]+1):sp(x,y,col)
+      a=x1 if d==0 and x1<x else x;e=x1 if d==0 and x1>x else x;L[j]=a if a<L[j] else L[j];R[j]=e if e>R[j] else R[j]
+  for y in range(t,b+1):
+    for x in range(L[y-t],R[y-t]+1):sp(x,y,col)
 def ln(a,b,sp=set_pixel):   # black line
   x0,y0=a;dx=b[0]-x0;dy=b[1]-y0;n=abs(dx) if abs(dx)>abs(dy) else abs(dy);r=RC[n]
   for i in range(n+1):sp(x0+((dx*i*r+32768)>>16),y0+((dy*i*r+32768)>>16),BK)
@@ -213,7 +195,7 @@ def bar(m=None,e=1):   # menu bar along the bottom, m = status message, e = eras
   if e:rc(0,H-16,W,16,WH)
   rc(0,H-17,W,1,TX);x=2
   for i in range(len(IT)):
-    t=IT[i] if i!=8 else ("2X2" if z.n==3 else "3X3");w=len(t)*7+8
+    t=IT[i];w=len(t)*7+8
     if i==z.sel:rc(x,H-15,w,14,HL)
     draw_string(x+4,H-14,t,TX,"small");x+=w+2
   if m:rc(196,140,188,14,WH);draw_string(200,141,m,TX,"small")
@@ -273,6 +255,42 @@ def run():
     elif s==7:
       if done():z.msg="ALREADY SOLVED";scr()
       else:solve();play()
-    else:bar("LOADING...");build(5-z.n if s==8 else z.n);z.ms=[];z.st=-1;scr()
+    elif s==8:z.C=list(z.F);z.ms=[];z.st=-1;scr()
+    else:return
+def stripe(x,y):   # thin bar in the cube colours
+  for i in range(5):rc(x+i*33,y,31,3,CO[(1,4,3,2,5)[i]])
+def card(i,on):   # home menu card, dark when picked
+  y=58+i*38;t,d,c=HM[i];rc(212,y,166,32,TX if on else PL);rc(212,y,4,32,CO[c] if on else LN)
+  for a,b in ((212,y),(377,y),(212,y+31),(377,y+31)):set_pixel(a,b,WH)
+  draw_string(226,y+4,t,WH if on else TX);draw_string(226,y+19,d,(176,182,206) if on else GY,"small")
+  if on:draw_string(362,y+10,">",HL)
+def foot(t):rc(0,H-17,W,1,LN);draw_string(8,H-13,"tobias-jermain / CG100-Tools",GY,"small");draw_string(260,H-13,t,GY,"small")
+def hdraw():
+  clear_screen();draw_string(212,6,"RUBIX",TX,"large");stripe(212,30);draw_string(212,38,"3D CUBE SOLVER",GY,"small")
+  for i in range(3):card(i,i==z.hm)
+  foot("UP/DOWN  EXE OPEN");cube();show_screen()
+def help():
+  clear_screen();draw_string(16,6,"HOW TO",TX,"large");stripe(16,30)
+  for i,t in enumerate(("LEFT / RIGHT   pick a menu item","UP or EXE   turn clockwise, or do it","DOWN   turn anticlockwise",
+    "MIX scrambles, SOLVE works it out and plays it","EXE during a solve skips to the end","HOME goes back here","Time your own solves with RUBIXTIMER.PY")):
+    draw_string(16,42+i*17,t,TX,"small")
+  foot("EXE  BACK");show_screen();keys()
+def home():   # home menu; the cube turns R U R' U' while you choose
+  hdraw();t=0;j=0
+  while 1:
+    k=getkey();t+=1
+    if k!=z.lk:
+      z.lk=k
+      if k==14 or k==34:card(z.hm,0);z.hm=(z.hm+(1 if k==34 else -1))%3;card(z.hm,1);show_screen()
+      if k==95 and z.hm==2:help();hdraw()
+      elif k==95:return 3-z.hm
+    if t>=HI:
+      m=(3,0,5,2)[j];j=(j+1)%4;t=0
+      for s in range(ST,7,ST):rc(8,0,200,H-18,WH);cube(dv(m,3),1-(m%3),s);show_screen()
+      z.C=app(z.C,z.M[m])
 clear_screen();draw_string(150,86,"LOADING...",BK);show_screen()
-build(3);run()
+build(3)
+while 1:
+  n=home();card(z.hm,1);draw_string(300,72+z.hm*38,"LOADING",HL,"small");show_screen()
+  if n!=z.n:build(n)
+  z.C=list(z.F);z.sel=0;z.ms=[];z.st=-1;z.msg="";run()

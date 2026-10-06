@@ -7,15 +7,19 @@ A 3D Rubik's cube solver for 2×2 and 3×3 cubes, plus a speedcubing timer, for 
 | **Files** | [`rubix.py`](rubix.py) (3D solver) and [`rubixtimer.py`](rubixtimer.py) (timer) |
 | **Type** | Tool |
 | **Runtime** | MicroPython 1.9.4 with `casioplot` |
-| **Size** | 278 and 166 lines (the calculator limit is 300) |
+| **Size** | 296 and 166 lines (the calculator limit is 300) |
 
 The solver and the timer are two separate programs, so each one fits under the 300-line limit.
 
 ## 🧊 Rubix (3D solver)
 
+### Home menu
+
+Rubix opens on a home screen: a 3D cube slowly turns on the left while you pick from three cards on the right: **3X3 CUBE**, **2X2 CUBE** and **HOW TO**. Use ⬆️ / ⬇️ to move and **EXE** to open. The picked card turns dark, with a stripe in that face's colour.
+
 ### Controls
 
-A menu runs along the bottom of the screen: `U R F D L B MIX SOLVE 2X2/3X3 RESET`.
+In the cube view a menu runs along the bottom of the screen: `U R F D L B MIX SOLVE RESET HOME`. `RESET` puts the cube back to solved and `HOME` goes back to the home menu.
 
 | Key | Action |
 |---|---|
@@ -28,7 +32,7 @@ A menu runs along the bottom of the screen: `U R F D L B MIX SOLVE 2X2/3X3 RESET
 ### Features
 
 - Shaded 3D cube that animates every turn: the layer swings round and you can see the black inside of the cube
-- 2×2 and 3×3 cubes (`2X2` / `3X3` switches between them)
+- 2×2 and 3×3 cubes, picked from the home menu
 - A flat net of all six faces next to the 3D view, so you can see the back, left and bottom too
 - Turn any face yourself, or press `MIX` for a random scramble
 - `SOLVE` works out a solution for whatever state the cube is in, then plays it back move by move in 3D. It shows the current step, a move counter and the next few moves
@@ -42,7 +46,7 @@ Standard colours: white top, green front, red right, yellow bottom, orange left,
 ### Settings
 
 ```python
-ST=2;SA=0;SL=(11,20)
+ST=2;SA=0;SL=(11,20);HI=300
 ```
 
 | Setting | What it does |
@@ -50,6 +54,7 @@ ST=2;SA=0;SL=(11,20)
 | `ST` | Animation step. `1` is smoothest (6 frames per quarter turn), `2` is the default, `3` is faster and `6` jumps straight to the end of each turn. |
 | `SA` | `1` animates the scramble too. `0` (default) scrambles instantly. |
 | `SL` | Scramble length for the 2×2 and the 3×3. |
+| `HI` | Pause between turns of the cube on the home screen. Bigger is calmer. |
 
 ### Notes
 
@@ -103,4 +108,4 @@ If there's no clock, the top bar shows **(TPS)**. The timer then counts loop tic
 
 1. Copy `rubix.py` and/or `rubixtimer.py` to the calculator.
 2. Open one from the Python app.
-3. **Rubix:** pick `MIX`, then `SOLVE`. **Timer:** press EXE to inspect, then hold and let go of EXE to start.
+3. **Rubix:** pick a cube on the home menu, then `MIX` and `SOLVE`. **Timer:** press EXE to inspect, then hold and let go of EXE to start.

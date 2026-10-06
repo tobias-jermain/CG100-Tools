@@ -22,6 +22,9 @@
 |---|---|---|
 | [🟡 **PAC-MAN**](pacman/description.md) | 🎮 Game | Pac-Man style arcade game with four ghosts, power pellets, fruit and endless levels |
 | [🐤 **Flappy Bird**](flappybird/description.md) | 🎮 Game | Flappy Bird clone with animated bird, scrolling scenery, medals and rising difficulty |
+| [🏰 **Golden Realm 3D**](goldenrealm3d/description.md) | 🎮 Game | First-person 3D medieval open world: find the gold in the golden fields |
+| [🌾 **Golden Realm**](goldenrealm/description.md) | 🎮 Game | Top-down medieval open world with wolves, villages and a castle: bring the gold to the king |
+| [🧱 **Tetris**](tetris/description.md) | 🎮 Game | Classic Tetris with ghost piece, next preview, wall kicks and levels |
 | [🧩 **Template**](template/description.md) | 🛠️ Starter | Blank starting point for a new program: copy it and rename |
 
 Each program has its own folder containing the code and a `description.md` that explains what it does and how to use it.
@@ -44,8 +47,17 @@ CG100-Tools/
 ├── pacman/
 │   ├── pacman.py
 │   └── description.md
-└── flappybird/
-    ├── flappybird.py
+├── flappybird/
+│   ├── flappybird.py
+│   └── description.md
+├── goldenrealm3d/
+│   ├── goldenrealm3d.py
+│   └── description.md
+├── goldenrealm/
+│   ├── goldenrealm.py
+│   └── description.md
+└── tetris/
+    ├── tetris.py
     └── description.md
 ```
 

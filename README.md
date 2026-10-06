@@ -8,7 +8,7 @@
 ![Language](https://img.shields.io/badge/MicroPython-1.9.4-yellow?style=for-the-badge&logo=python&logoColor=white)
 ![Library](https://img.shields.io/badge/library-casioplot-green?style=for-the-badge)
 
-*Small programs, written to fit and run on a calculator.*
+*Small programs, written to fit and run on the fx-CG100 without modifying the binaries/OS..*
 
 </div>
 

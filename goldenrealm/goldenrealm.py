@@ -1,5 +1,5 @@
 # GOLDEN REALM for Casio fx-CG100 (MicroPython 1.9.4, casioplot)
-# Arrows = walk, EXE = dash / start, AC = quit. Speedrun: gather every golden sheaf, then sail for Vinland.
+# Arrows = walk, EXE = dash / start, AC = quit. Speedrun: gather the golden sheaves and bring the harvest home.
 from casioplot import *
 SPD=0;PS=2;NG=12;FPS=30;MG=(75,95,120)
 # SPD = extra delay per tick, PS = walk speed in pixels, NG = sheaves to gather,
@@ -7,10 +7,10 @@ SPD=0;PS=2;NG=12;FPS=30;MG=(75,95,120)
 W=384;H=192;HY=16;TW=24;TH=11;SW=5;SH=5;WX=120;WY=55;VW=384;VH=176
 BK=(0,0,0);WH=(255,255,255);HB=(58,40,26);GO=(255,214,90);CR=(255,236,190);GR=(110,96,80)
 KM={14:0,23:1,34:2,25:3};DX=(0,-1,0,1);DY=(-1,0,1,0)
-TS=".,TPBAUkFfYrWXxZV=RbhHDM"   # grass,wheat,oak,pine,birch,apple,autumn,bush,fence,flowers,hay,runestone,
-SL="TPBAUkFYrWXxZVhHDM"         # water,ship bow,hull,stern,sail,planks,path,sand,turf roof,wall,door,rock
-G=(104,170,76);WA=(58,120,190);WD=(124,84,52);BA=(G,(228,190,84),G,G,G,G,G,G,G,G,G,G,WA,WA,WA,WA,WA,(150,104,62),(198,168,120),(232,212,160),(96,146,66),WD,WD,(130,122,114))
-SD=(78,136,62);TR=(110,72,42);HU=(128,82,46);CN={2:((54,126,58),(92,162,74),(36,96,46)),5:((58,130,60),(96,166,78),(38,98,48)),6:((222,130,50),(246,180,86),(170,88,38))}
+TS=".,TPBAUkFfYrW12=RbhHDM"   # grass,wheat,oak,pine,birch,apple,autumn,bush,fence,flowers,hay,runestone,water,
+SL="TPBAUkFYrWhHDM"           # windblown wheat,rippled water (animation frames),planks,path,sand,turf roof,wall,door,rock
+G=(104,170,76);WA=(58,120,190);WD=(124,84,52);BA=(G,(228,190,84),G,G,G,G,G,G,G,G,G,G,WA,(228,190,84),WA,(150,104,62),(198,168,120),(232,212,160),(96,146,66),WD,WD,(130,122,114))
+FS=((14,10),(92,12),(16,46),(84,48));SD=(78,136,62);TR=(110,72,42);CN={2:((54,126,58),(92,162,74),(36,96,46)),5:((58,130,60),(96,166,78),(38,98,48)),6:((222,130,50),(246,180,86),(170,88,38))}
 class Z:pass
 z=Z();z.r=1066;z.pb=0
 def rn(n):z.r=(z.r*75+74)%65537;return z.r%n
@@ -57,44 +57,36 @@ def px(t,x,y):   # colour of pixel (x,y) of tile t
       if x>4 and x<12 and y>1 and y<15 and not((x==5 or x==11) and y==2):
         c=(184,52,40) if y>3 and y<12 and (x==8 or (x+y)%5==0) and x>5 and x<11 else (116,116,124) if x>9 else (158,158,166)
       elif y==15 and x>4 and x<14:c=SD
-  elif t<17:   # water, with the longship on it
-    c=(118,174,226) if y%8==3 and (x+y)%8<3 else (46,102,172) if n<5 else b
-    if t==13:
-      if y>7 and y<13 and x>=y-6:c=HU if y<12 else (90,56,30)
-      if (x==3 and y>2 and y<9) or (y==3 and x>0 and x<6) or (y==2 and x>1 and x<5):c=GO if x==4 and y==2 else (150,100,50)
-    elif t==14:
-      if y>7 and y<13:c=(160,110,62) if y==8 else HU if y<12 else (90,56,30)
-      elif x>6 and x<9:c=TR
-      for cx,k in ((3,(190,50,40)),(12,(236,230,214))):
-        if (x-cx)*(x-cx)+(y-7)*(y-7)<=5:c=GO if x==cx and y==7 else k
-    elif t==15:
-      if y>7 and y<13 and x<=21-y:c=HU if y<12 else (90,56,30)
-      if (x==12 and y>2 and y<9) or (y==3 and x>9 and x<14):c=(150,100,50)
-    elif t==16:c=TR if x>6 and x<9 else c if x<1 or x>14 or y<1 or y>14 else (90,60,36) if y==1 else (186,48,40) if ((x-1)>>2)&1 else (236,226,200)
-  elif t==17:c=(96,64,38) if y==0 or y==15 else (122,82,48) if y%4==0 or n<3 else b
-  elif t==18:c=(176,146,104) if n<9 else (222,198,156) if n>90 else b
-  elif t==19:c=(214,192,140) if n<10 else (244,228,184) if n>92 else b
-  elif t==20:c=(110,72,40) if y>12 else (74,118,52) if (x+(y>>1))%5==0 else (132,182,92) if n>90 else (240,200,80) if n==50 else b
-  elif t<23:
+  elif t==12 or t==14:   # water, with two ripple frames
+    c=(118,174,226) if ((y%8==3 and (x+y)%8<3) if t==12 else (y%8==5 and (x+y+4)%8<3)) else (46,102,172) if n<5 else b
+  elif t==13:c=((255,240,176) if y%8<2 else (204,158,58)) if (x+(y&7)+2*(y>>3))%4==1 else b   # wheat bent by the wind
+  elif t==15:c=(96,64,38) if y==0 or y==15 else (122,82,48) if y%4==0 or n<3 else b
+  elif t==16:c=(176,146,104) if n<9 else (222,198,156) if n>90 else b
+  elif t==17:c=(214,192,140) if n<10 else (244,228,184) if n>92 else b
+  elif t==18:c=(110,72,40) if y>12 else (74,118,52) if (x+(y>>1))%5==0 else (132,182,92) if n>90 else (240,200,80) if n==50 else b
+  elif t<21:
     c=(70,46,28) if y==15 else (88,58,36) if x%4==3 else b
-    if t==22 and x>3 and x<12 and y>2 and not(y==3 and (x==4 or x==11)):c=(204,172,90) if x==10 and y==9 else (54,34,20) if x==7 else (72,46,28)
+    if t==20 and x>3 and x<12 and y>2 and not(y==3 and (x==4 or x==11)):c=(204,172,90) if x==10 and y==9 else (54,34,20) if x==7 else (72,46,28)
   else:c=(98,92,86) if n<22 or y>13 else (166,158,150) if n>80 or y<2 else b
-  if t==1 and (x+2*(y>>3))%4==1:c=(250,226,140) if y%8==1 else (196,150,52)
+  if t==1:c=((250,226,140) if y%8==1 else (196,150,52)) if (x+2*(y>>3))%4==1 else b
   return c
 GP=[];GI={}
 def ix(c):
   if c not in GI:GI[c]=len(GP);GP.append(c)
   return chr(35+GI[c])
 # tiles are stored as strings of palette indexes (saves memory); DT = pixels that differ from the base colour
-TP=[[''.join([ix(px(t,x,y)) for x in range(16)]) for y in range(16)] for t in range(24)]
-DT=[[(y<<4)|x for y in range(16) for x in range(16) if GP[ord(TP[t][y][x])-35]!=BA[t]] for t in range(24)]
-PP={'Y':(236,200,110),'y':(196,156,80),'S':(240,200,160),'K':(40,30,24),'G':(74,124,96),'g':(50,90,70),'B':GO,'b':(110,70,40),'L':(120,110,96),'W':(246,246,240),'w':(210,210,204),'E':WH,'O':(246,206,80),'o':(252,232,150)}
+TP=[[''.join([ix(px(t,x,y)) for x in range(16)]) for y in range(16)] for t in range(22)]
+DT=[[(y<<4)|x for y in range(16) for x in range(16) if GP[ord(TP[t][y][x])-35]!=BA[t]] for t in range(22)]
+PP={'Y':(236,200,110),'y':(196,156,80),'S':(240,200,160),'K':(40,30,24),'G':(74,124,96),'g':(50,90,70),'B':GO,'b':(110,70,40),'L':(120,110,96),'W':(246,246,240),'w':(210,210,204),'E':WH,'O':(246,206,80),'o':(252,232,150),'R':(240,140,60)}
 def spr(R):return [(x,y,PP[R[y][x]]) for y in range(len(R)) for x in range(len(R[0])) if R[y][x]!='.']
 LG=(("...LL..LL...","...LL..LL...","...KK..KK..."),("..LL....LL..","..LL....LL..","..KK....KK.."))
 BD=("..gGGGGGGg..",".SgGGBBGGgS.",".SgGGGGGGgS.","..gGGGGGGg..","..bbbbbbbb..")
 PF=[spr(("....YYYY....","...YYYYYY...","...YSSSSY...","...SKSSKS...","....SSSS....")+BD+l) for l in LG];PB=[spr(("....YYYY....","...YYYYYY...","...YYYYYY...","...yYYYYy...","....yyyy....")+BD+l) for l in LG]
 SB=("...wWWWw....",".wWWWWWWWw..","wWWWWWWWWKK.","WWWWWWWWKEKK","wWWWWWWWWKK.",".wwwwwwwww..");SP=[spr(SB+("..K.K..K.K..","..K.K..K.K..")),spr(SB+("...KK...KK..","...KK...KK.."))]
-SV=spr(("..b.b.b..",".bobobob.",".bOOoOOb.","..bOOOb..","...bbb...","..bOOOb..",".bOOOOOb.","bOObObOOb",".bb.b.bb."))
+SR=("..bOOOb..","...bbb...","..bOOOb..",".bOOOOOb.","bOObObOOb",".bb.b.bb.");SV=spr(("..b.b.b..",".bobobob.",".bOOoOOb.")+SR)
+ST=spr(("..b.b.b..",".bobEbob.",".bOOoOOb.")+SR)   # twinkle frame (same pixels, one turns white)
+BF=[[spr(tuple(q.replace('C',L) for q in R)) for R in (("CC.CC","CCKCC","..K.."),("..K..",".CKC.","..K.."))] for L in "EOR"]   # butterflies
+PU=(spr((".ww.","wWWw","wWWw",".ww.")),spr(("ww","ww")))   # chimney smoke
 def world():
   g=[['.']*WX for i in range(WY)]
   def put(x,y,c):
@@ -124,7 +116,7 @@ def world():
         c=x>=x0 and y>=y0 and x<x0+w and y<y0+h;put(x,y,',' if c else '.')
         if c:z.fd.append((x,y))
     for x in range(x0,x0+w*rn(2)):put(x,y0-1,'F' if x-x0!=w>>1 else '.')
-  for cx,cy in ((14,10),(92,12),(16,46),(84,48)):   # farmsteads
+  for cx,cy in FS:   # farmsteads
     for a in range(-1,6):
       for b in range(-1,4):put(cx+a,cy+b,'h' if a>=0 and a<4 and b<2 else ('D' if a==1 else 'H') if a>=0 and a<4 and b==2 else 'Y' if a==5 and b==1 else '.')
   xs=104
@@ -135,10 +127,8 @@ def world():
   for y in range(22,33):   # keep the home farm screen clear
     for x in range(48,72):put(x,y,'.')
   for y in range(3,WY-3):put(58,y,'=' if g[y][58]=='W' else 'R')
-  for x in range(3,WX):   # road to the dock and the longship
-    if g[26][x]=='W' and x>95:
-      for i in range(x,x+5):put(i,26,'=')
-      put(x+2,25,'X');put(x+3,25,'x');put(x+4,25,'Z');put(x+3,24,'V');z.dk=x+3;break
+  for x in range(3,WX):   # road from the hills to the beach
+    if g[26][x]=='W' and x>95:break
     put(x,26,'=' if g[26][x]=='W' else 'R')
   for y in range(22,26):   # home farm: longhouse, orchard, hay and fields
     for x in range(50,68):put(x,y,'.')
@@ -160,6 +150,7 @@ while len(S0)<NG:
   for q in S0:
     if abs(q[0]-p[0])+abs(q[1]-p[1])<14:ok=0
   if ok:S0.append(p)
+CH=[(58*16+6,23*16)]+[((cx+1)*16+8,cy*16) for cx,cy in FS]   # chimneys
 z.fd=0;CUR=[-1]*(TW*TH);SX=[i<<4 for j in range(TH) for i in range(TW)];SY=[HY+(j<<4) for j in range(TH) for i in range(TW)]
 def dtile(i,t,u,sp=set_pixel):   # draw tile t over tile u; if both share a base colour only the detail pixels are touched
   X=SX[i];Y=SY[i];g=TP[t]
@@ -213,10 +204,14 @@ def enter():
     if len(z.sh)>=1+rn(2):break
     x=rn(VW-12);y=rn(VH-8)
     if wf(x,y):z.sh.append([x,y,rn(5),0,0])
+  z.bf=[[rn(VW-5),rn(VH-3),1-2*rn(2),rn(3)] for k in range(2)]
 def redraw():
   for x,y,S in z.dr:es(x,y,S)
-  for g in z.gs:ds(g[0],g[1],SV)
-  d=[(s[0],s[1],SP[s[4]]) for s in z.sh]+[(z.x,z.y,(PB if z.f==0 else PF)[(z.st>>2)&1])]
+  for g in z.gs:ds(g[0],g[1],ST if (z.t>>2)&7==0 else SV)
+  a=z.sx*VW;b=z.sy*VH;d=[(s[0],s[1],SP[s[4]]) for s in z.sh]+[(z.x,z.y,(PB if z.f==0 else PF)[(z.st>>2)&1])]+[(f[0],f[1],BF[f[3]][(z.t>>1)&1]) for f in z.bf]
+  for x,y in CH:
+    if x>=a and y>=b+16 and x<a+VW-8 and y<b+VH:
+      for k in range(3):o=((z.t+k*21)&63)>>2;d.append((x-a+(o>>2),y-b-o,PU[o>7]))
   for x,y,S in d:ds(x,y,S)
   z.dr=d
 def go(ix,iy,x,y):
@@ -240,6 +235,10 @@ def step(d,v):
     if ix or iy:go(ix,iy,tx,ty)
     else:z.x=tx;z.y=ty
 def sheep():
+  for f in z.bf:   # butterflies zigzag about
+    f[0]+=f[2];f[1]+=(1,0,-1,0)[(z.t>>2)&3]
+    if f[0]<1 or f[0]>VW-7 or rn(60)==0:f[2]=-f[2]
+    f[1]=1 if f[1]<1 else VH-4 if f[1]>VH-4 else f[1]
   for s in z.sh:
     s[3]-=1
     if s[3]<=0:s[2]=rn(6);s[3]=20+rn(50)
@@ -247,6 +246,16 @@ def sheep():
       nx=s[0]+DX[s[2]];ny=s[1]+DY[s[2]]
       if nx>=0 and ny>=0 and nx<=VW-12 and ny<=VH-8 and wf(nx,ny):s[0]=nx;s[1]=ny;s[4]=(nx+ny>>2)&1
       else:s[3]=0
+def wind():
+  c=z.wc;z.wc=0 if c>TW+30 else c+1
+  for j in range(TH):
+    i=j*TW+c
+    if c<TW:
+      u=CUR[i];t=13 if u==1 else 14 if u==12 else 0
+      if t:dtile(i,t,u);CUR[i]=t
+    if c>2 and c<TW+3:
+      u=CUR[i-3];t=1 if u==13 else 12 if u==14 else 0
+      if t:dtile(i-3,t,u);CUR[i-3]=t
 def save():
   try:f=open("goldenrealm.txt","w");f.write(str(z.pb));f.close()   # keep the record between sessions if files work
   except Exception:pass
@@ -262,9 +271,9 @@ def finish():
   md="GOLD MEDAL!" if sec<MG[0] else "SILVER MEDAL" if sec<MG[1] else "BRONZE MEDAL" if sec<MG[2] else "KEEP TRYING!"
   if old==0 or t<old:z.pb=t;save();r="NEW RECORD!"
   else:r="PB "+fm(old,1)+"  +"+fm(t-old,1)
-  box("SAIL FOR VINLAND!","TIME "+fm(t,1)+"   "+md,r,"EXE: RUN AGAIN")
+  box("HARVEST HOME!","TIME "+fm(t,1)+"   "+md,r,"EXE: RUN AGAIN")
 def newrun():
-  z.sv=[[(p[0]<<4)+4,(p[1]<<4)+3] for p in S0];z.f=2;z.g=0;z.st=0;z.t=0;z.fr=0;z.dc=0;z.dd=0;z.ex=1;z.kt=0
+  z.sv=[[(p[0]<<4)+4,(p[1]<<4)+3] for p in S0];z.f=2;z.g=0;z.st=0;z.t=0;z.fr=0;z.dc=0;z.dd=0;z.ex=1;z.wc=0
   go(2-z.sx,2-z.sy,162,58);hud();redraw()
 def play():
   while 1:
@@ -278,18 +287,14 @@ def play():
     for g in z.gs:
       if abs(g[0]-z.x-2)<9 and abs(g[1]-z.y-4)<10:
         es(g[0],g[1],SV);z.gs=[q for q in z.gs if q!=g];z.sv=[q for q in z.sv if q!=g[2]];z.g+=1
-        txt(14,40,str(z.g)+"/"+str(NG),GO);hm(("SHEAF "+str(z.g)+"  " if z.g<NG else "ALL! TO THE SHIP ")+fm(z.t,1));break
-    if z.kt:z.kt-=1
-    X=z.sx*VW+z.x+6;Y=z.sy*VH+z.y+10
-    if abs(X-(z.dk<<4)-8)<24 and abs(Y-424)<24 and z.kt==0:
-      z.kt=60
-      if z.g>=NG:redraw();finish();return
-      hm("SHIP: "+str(NG-z.g)+" SHEAVES LEFT")
+        txt(14,40,str(z.g)+"/"+str(NG),GO);hm(("SHEAF "+str(z.g)+"  " if z.g<NG else "ALL! HEAD HOME ")+fm(z.t,1));break
+    if z.g>=NG and abs(z.sx*VW+z.x-930)<20 and abs(z.sy*VH+z.y-414)<20:redraw();finish();return   # back at the longhouse door
+    if z.t%3==0:wind()
     if z.mt:z.mt-=1;z.mt or hm()
     z.t+=1;z.fr+=1
     if z.fr>=FPS:z.fr=0;txt(58,40,fm(z.t,0))
     redraw();show_screen();dly(SPD)
 load();z.dr=[];z.gs=[];z.sx=2;z.sy=2;newrun()
-box("GOLDEN REALM","A cozy Norse speedrun.","Gather "+str(NG)+" sheaves, sail for Vinland.","EXE: START",1)
+box("GOLDEN REALM","A cozy harvest speedrun.","Gather "+str(NG)+" sheaves, bring them home.","EXE: START",1)
 while 1:
   play();newrun()

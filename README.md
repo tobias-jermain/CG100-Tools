@@ -22,7 +22,7 @@
 |---|---|---|
 | [🟡 **PAC-MAN**](pacman/description.md) | 🎮 Game | Pac-Man style arcade game with four ghosts, power pellets, fruit and endless levels |
 | [🐤 **Flappy Bird**](flappybird/description.md) | 🎮 Game | Flappy Bird clone with animated bird, scrolling scenery, medals and rising difficulty |
-| [🌾 **Golden Realm**](goldenrealm/description.md) | 🎮 Game | Cozy Norse farming speedrun: gather the golden sheaves and sail for Vinland |
+| [🌾 **Golden Realm**](goldenrealm/description.md) | 🎮 Game | Cozy farming speedrun through golden fields and green valleys, with wind, smoke and butterflies |
 | [🧱 **Tetris**](tetris/description.md) | 🎮 Game | Classic Tetris with ghost piece, next preview, wall kicks and levels |
 | [🧩 **Template**](template/description.md) | 🛠️ Starter | Blank starting point for a new program: copy it and rename |
 

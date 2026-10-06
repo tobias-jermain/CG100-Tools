@@ -1,13 +1,13 @@
 # 🌾 Golden Realm
 
-A cozy Norse farming speedrun for the Casio fx-CG100. Run across a peaceful fjord valley, gather the golden sheaves from the wheat fields, then board the longship and sail for Vinland as fast as you can.
+A cozy farming speedrun for the Casio fx-CG100. Run across green valleys, gather the golden sheaves from the wheat fields and bring the harvest home as fast as you can.
 
 | | |
 |---|---|
 | **File** | [`goldenrealm.py`](goldenrealm.py) |
 | **Type** | Game |
 | **Runtime** | MicroPython 1.9.4 with `casioplot` |
-| **Size** | 295 lines (the calculator limit is 300) |
+| **Size** | 300 lines (the calculator limit is 300) |
 
 ## Controls
 
@@ -19,9 +19,9 @@ A cozy Norse farming speedrun for the Casio fx-CG100. Run across a peaceful fjor
 
 ## The run
 
-1. You start outside the longhouse on the home farm.
+1. You start at the door of the longhouse on the home farm.
 2. Gather all **12 golden sheaves** hidden in the wheat fields.
-3. Run to the dock on the fjord and board the **longship** to stop the clock.
+3. Run back to the longhouse door to stop the clock.
 
 The map and the sheaves are **the same every run**, so you can learn the valley and plan a route. The timer counts game ticks, so the short pause when you walk onto a new screen doesn't cost you time.
 
@@ -37,10 +37,18 @@ The map and the sheaves are **the same every run**, so you can learn the valley 
 
 ## The valley
 
-- 120×55 tile world (5×5 screens): pine woods in the northern hills, mixed woods, an autumn grove, a river with bridges, flower meadows, farmsteads and a sandy beach on the fjord
+- 120×55 tile world (5×5 screens): pine woods in the northern hills, mixed woods, an autumn grove, golden wheat fields, a river with bridges, flower meadows, farmsteads and a sandy beach by the sea
 - Six kinds of tree and plant: oak, pine, birch, apple, autumn maple and berry bushes
-- Turf-roofed longhouses, haystacks, fences, runestones and a longship with a striped sail, shields and a dragon prow
-- Sheep wander the fields. They're only there for company, so they never get in your way
+- Turf-roofed longhouses, haystacks, fences and runestones
+
+## Animations
+
+- **Wind:** gusts sweep across the screen, bending the wheat (the heads catch the light) and rippling the water
+- **Chimney smoke:** rises and drifts from every longhouse
+- **Butterflies:** white, yellow and orange, flutter over the meadows
+- **Sheep:** wander the fields. They're only there for company, so they never get in your way
+- **Sheaves:** twinkle so you can spot them in the wheat
+- **The farmer:** has a walking animation, with a back view when walking up
 - Mini-map of the valley in the top bar
 - Title screen carries the **tobias-jermain / CG100-Tools** badge
 
@@ -64,7 +72,7 @@ The best time is saved to `goldenrealm.txt` on the calculator when file saving i
 
 ## Speed and memory
 
-- Walking costs about **400 pixel writes per tick** (Flappy Bird does about 1,200 per frame). Sprites are erased by repainting only the tile pixels under them.
+- Walking with all the animations running costs about **500 pixel writes per tick** (Flappy Bird does about 1,200 per frame). Sprites are erased by repainting only the tile pixels under them, and the wind only repaints the stalks that move.
 - A new screen redraws only the tiles that differ. Tiles on grass (trees, flowers, fences, hay) only repaint their detail pixels, so a screen change costs about 20,000–45,000 pixel writes instead of 67,000.
 - Tiles are stored as short strings of colour indexes, which keeps memory low: the whole game uses about half the memory of the first version.
 

@@ -19,6 +19,8 @@
 | Program | Type | Description |
 |---|---|---|
 | [🟡 **PAC-MAN**](pacman/description.md) | 🎮 Game | Pac-Man style arcade game with four ghosts, power pellets, fruit and endless levels |
+| [🐤 **Flappy Bird**](flappybird/description.md) | 🎮 Game | Flappy Bird clone with animated bird, scrolling scenery, medals and rising difficulty |
+| [🧩 **Template**](template/description.md) | 🛠️ Starter | Blank starting point for a new program: copy it and rename |
 
 Each program has its own folder containing the code and a `description.md` that explains what it does and how to use it.
 
@@ -34,17 +36,24 @@ Each program has its own folder containing the code and a `description.md` that 
 CG100-Tools/
 ├── README.md
 ├── CONTRIBUTING.md
-└── pacman/
-    ├── pacman.py
+├── template/
+│   ├── template.py
+│   └── description.md
+├── pacman/
+│   ├── pacman.py
+│   └── description.md
+└── flappybird/
+    ├── flappybird.py
     └── description.md
 ```
 
-New programs follow the same pattern: one folder per program, with the code and a `description.md`.
+New programs follow the same pattern: one folder per program, with the code and a `description.md`. Start by copying the [`template/`](template/description.md) folder.
 
 ## ⚙️ Requirements
 
 - Casio **fx-CG100**
 - MicroPython **1.9.4** with the `casioplot` module
+- Programs of at most **300 lines** (the calculator's limit)
 
 ## 📝 Notes
 

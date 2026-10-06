@@ -33,6 +33,7 @@ Each program has its own folder containing the code and a `description.md` that 
 ```text
 CG100-Tools/
 ├── README.md
+├── CONTRIBUTING.md
 └── pacman/
     ├── pacman.py
     └── description.md
@@ -49,3 +50,7 @@ New programs follow the same pattern: one folder per program, with the code and 
 
 - Programs are written compactly, with short names and little whitespace, to keep memory use low.
 - Games often have a speed setting near the top of the file, such as `SPD` in PAC-MAN. Change it if a game runs too fast or too slow.
+
+## 🤝 Contributing
+
+Want to add a game or tool? Read [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming, commit style and how to structure a program.

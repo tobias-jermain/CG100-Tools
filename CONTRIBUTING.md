@@ -35,7 +35,7 @@ Update README programs table
 
 ## 📁 Adding a program
 
-Each program gets its own folder, named in lowercase with no spaces:
+Copy the [`template/`](template/description.md) folder to get started. Each program gets its own folder, named in lowercase with no spaces:
 
 ```text
 program-name/
@@ -54,10 +54,11 @@ Then add a row for it to the programs table in `README.md`.
 5. Any settings the user can change (like `SPD` in PAC-MAN)
 6. How to run it
 
-Use [`pacman/description.md`](pacman/description.md) as a template.
+Use [`template/description.md`](template/description.md) as the starting point, or [`pacman/description.md`](pacman/description.md) as a finished example.
 
 ## 🧮 Code rules
 
+- Keep programs to **300 lines or fewer**, which is the fx-CG100 limit.
 - Target **MicroPython 1.9.4** with `casioplot` on the **Casio fx-CG100**. Avoid newer Python features.
 - Put a comment on the first line saying what the program is and how to control it.
 - Memory is tight, so short names and compact code are fine. Comment anything that isn't obvious.

@@ -24,6 +24,7 @@
 | [🐤 **Flappy Bird**](flappybird/description.md) | 🎮 Game | Flappy Bird clone with animated bird, scrolling scenery, medals and rising difficulty |
 | [🌾 **Golden Realm**](goldenrealm/description.md) | 🎮 Game | Cozy farming speedrun through golden fields and green valleys, with wind, smoke and butterflies |
 | [🧱 **Tetris**](tetris/description.md) | 🎮 Game | Classic Tetris with ghost piece, next preview, wall kicks and levels |
+| [🎬 **Video Player**](video/description.md) | 🛠️ Tool | Plays short, blocky colour clips made from a GIF with the included PC converter |
 | [🧩 **Template**](template/description.md) | 🛠️ Starter | Blank starting point for a new program: copy it and rename |
 
 Each program has its own folder containing the code and a `description.md` that explains what it does and how to use it.
@@ -52,8 +53,12 @@ CG100-Tools/
 ├── goldenrealm/
 │   ├── goldenrealm.py
 │   └── description.md
-└── tetris/
-    ├── tetris.py
+├── tetris/
+│   ├── tetris.py
+│   └── description.md
+└── video/
+    ├── video.py
+    ├── mkvideo.py
     └── description.md
 ```
 

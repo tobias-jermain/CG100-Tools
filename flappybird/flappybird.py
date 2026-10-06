@@ -1,13 +1,14 @@
 # FLAPPY BIRD for Casio fx-CG100 (MicroPython 1.9.4, casioplot)
 # EXE/UP = flap, DOWN = pause, AC = quit. SPD = extra delay per frame,
 # MS = move pipes/ground every MS frames (2-3 = faster, but steppier).
+# Y1,Y2 = where the blue sky fades to white (set both to GY for a full blue sky, slower to load).
 from casioplot import *
 from random import randint
 SPD=2000;MS=1
 W=384;H=192;GY=172;HY=16;CW=28;CH=10;BX=80;BW=18;BT=11;SP=150;GS=20
-SKY=(78,192,202);WH=(255,255,255);NV=(30,40,80);RD=(224,62,32)
+SKY=(78,192,202);SK2=(168,224,230);Y1=32;Y2=44;WH=(255,255,255);NV=(30,40,80);RD=(224,62,32)
 PO=(84,56,71);PL=(160,224,70);PM=(116,190,45);PD=(84,150,30)
-BU=(92,170,60);BL=(130,215,80);CLD=(240,252,250)
+BU=(92,170,60);BL=(130,215,80);CLD=(250,252,252)
 GL=(150,220,70);GD=(100,175,45);DT=(222,216,149);DL=(250,245,190)
 FK=(95,14);G=7;FL=-84;VM=112;PX=122;PY=44;PW=140;PH=72
 BP={'K':PO,'Y':(247,216,66),'W':WH,'R':RD,'B':(250,238,190),'O':(240,150,40)}
@@ -18,7 +19,7 @@ BR=(
 WG=(".KKKKKK...........",".KOOOOK...........","..KKKK............")
 WF=(1,0,1,2)
 class Z:pass
-z=Z();z.hi=0;z.pn=0;z.oy=90;z.pp=[];z.go=0
+z=Z();z.hi=0;z.hd=0;z.pn=0;z.oy=90;z.pp=[];z.go=0
 def bs(t):
   g=[]
   for j in range(BT):
@@ -38,10 +39,10 @@ def isq(n):
   r=0
   while (r+1)*(r+1)<=n:r+=1
   return r
-BH=[];CT=[];CB=[]
-for x in range(W):
-  d=(x%32)-16;BH.append(5+((isq(256-d*d)*5)>>3));CT.append(0);CB.append(0)
-for cx,b in ((50,64),(150,46),(250,72),(340,52)):
+BH=[];CT=[];CB=[];T=[]
+for x in range(32):d=x-16;T.append(4+((isq(256-d*d)*3)>>3))
+for x in range(W):BH.append(T[x%32]);CT.append(0);CB.append(0)
+for cx,b in ((50,40),(150,31),(250,42),(340,34)):
   for dx,r in ((-14,10),(0,14),(14,10)):
     for x in range(cx+dx-r,cx+dx+r+1):
       if x>=0 and x<W:
@@ -53,9 +54,15 @@ def rc(x,y,w,h,c):
     for j in range(h):set_pixel(x+i,y+j,c)
 def dly(n):
   for i in range(n):pass
+def sk(a,b):
+  r=[]
+  for s,e,c in ((HY,Y1,SKY),(Y1,Y2,SK2),(Y2,GY,WH)):
+    s=mx(s,a);e=min(e,b)
+    if e>s:r.append((s,e,c))
+  return r
 def bgl(x):
   t=GY-BH[x];c=CT[x]
-  s=[(HY,c,SKY),(c,CB[x],CLD),(CB[x],t,SKY)] if c else [(HY,t,SKY)]
+  s=sk(HY,c)+[(c,CB[x],CLD)]+sk(CB[x],t) if c else sk(HY,t)
   return s+[(t,t+2,BL),(t+2,GY,BU)]
 def bgs(x,a,b):
   r=[]
@@ -91,9 +98,11 @@ def mv(v):
 def gnd(o,s):
   for x0 in range(-(o%GS),W+GS,GS):
     for x in range(mx(0,x0-s),min(W,x0)):rc(x,GY+1,1,4,GD if (x+o+s)%(2*GS)>=GS else GL)
-def hs():
-  rc(2,2,100,12,NV);draw_string(6,3,"SCORE "+str(z.s),WH,"small")
-  rc(284,2,98,12,NV);draw_string(288,3,"BEST "+str(z.hi),WH,"small")
+def hs(e):
+  if e:rc(2,2,100,12,NV)
+  draw_string(6,3,"SCORE "+str(z.s),WH,"small")
+  if e:rc(284,2,98,12,NV)
+  draw_string(288,3,"BEST "+str(z.hi),WH,"small")
 def drawb():
   by=z.y>>4;rest(BX,BX+BW,z.oy,z.oy+BT);z.oy=by
   for i,j,c in BS[WF[(z.t>>1)&3]]:set_pixel(BX+i,by+j,c)
@@ -113,14 +122,17 @@ def newg():
   if z.pn:rest(PX,PX+PW,PY,PY+PH)
   rest(BX,BX+BW,z.oy,z.oy+BT)
   z.pn=0;z.s=0;z.v=2;z.pb=z.hi;z.lt=70;z.vy=0;z.y=90<<4;z.oy=90;z.fp=1;z.t=0
-  hs()
+  hs(z.hd);z.hd=1
+def bdg(x,y):
+  for a,b,w,h in ((0,0,100,1),(0,23,100,1),(0,0,1,24),(99,0,1,24),(100,2,2,24),(2,24,100,2)):rc(x+a,y+b,w,h,PO)
+  rc(x+1,y+1,98,22,WH);draw_string(x+5,y+3,"tobias-jermain",PO,"small");draw_string(x+5,y+13,"/ CG100-Tools",(0,102,204),"small")
 def ready():
-  draw_string(139,29,"FLAPPY BIRD",PO);draw_string(138,28,"FLAPPY BIRD",WH)
-  draw_string(125,56,"EXE / UP : FLAP",PO,"small");draw_string(125,68,"DOWN : PAUSE",PO,"small")
+  draw_string(139,29,"FLAPPY BIRD",WH);draw_string(138,28,"FLAPPY BIRD",NV)
+  draw_string(125,56,"EXE / UP : FLAP",PO,"small");draw_string(125,68,"DOWN : PAUSE",PO,"small");bdg(140,86)
   while 1:
     z.t+=1;z.y=(84+abs(z.t%32-16))<<4;drawb();dly(SPD)
     if getkey() in FK:break
-  rest(100,300,22,80);z.vy=FL
+  rest(100,300,22,114);z.vy=FL
 def play():
   while 1:
     z.t+=1;k=getkey();f=k in FK
@@ -140,7 +152,7 @@ def play():
     for p in z.pp:
       if p[0]<BX+BW-2 and p[0]+CW>BX+2 and (by+2<p[1] or by+BT-2>p[1]+p[2]):dead=1
       if not p[3] and p[0]+CW<BX:
-        p[3]=1;z.s+=1;z.v=2+(z.s>=10)+(z.s>=25);z.hi=mx(z.hi,z.s);hs()
+        p[3]=1;z.s+=1;z.v=2+(z.s>=10)+(z.s>=25);z.hi=mx(z.hi,z.s);hs(1)
     drawb()
     if dead:return
     dly(SPD)
@@ -167,7 +179,7 @@ def over():
 clear_screen()
 for x in range(W):
   for a,b,c in bgs(x,HY,GY):
-    if c!=SKY or SKY!=WH:
+    if c!=WH:
       for y in range(a,b):set_pixel(x,y,c)
 rc(0,0,W,HY,NV);rc(0,GY,W,1,PO);rc(0,GY+5,W,1,DL);rc(0,GY+6,W,H-GY-6,DT)
 for x in range(W):rc(x,GY+1,1,4,GD if x%(2*GS)>=GS else GL)

@@ -289,6 +289,8 @@ def run():
 clear_screen()
 draw_string(180,4,"SCORE",BK);draw_string(180,48,"HIGH SCORE",BK)
 draw_string(180,160,"ARROWS:MOVE",(90,90,90),"small");draw_string(180,174,"EXE:PAUSE",(90,90,90),"small")
+for a,b,w,h in ((0,0,100,1),(0,23,100,1),(0,0,1,24),(99,0,1,24),(100,2,2,24),(2,24,100,2)):rc(262+a,164+b,w,h,BK)
+draw_string(267,167,"tobias-jermain",BK,"small");draw_string(267,177,"/ CG100-Tools",(0,102,204),"small")
 while 1:
   z.lv=1;z.sc=0;z.lives=3;z.xl=0;z.fv=0
   z.gh=[Gh(i) for i in range(4)]

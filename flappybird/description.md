@@ -22,6 +22,7 @@ Each press is one flap. Holding the key does nothing extra.
 ## Features
 
 - Coloured sky, clouds, rolling bush hills and a scrolling striped ground
+- Title screen carries the **tobias-jermain / CG100-Tools** badge
 - Animated bird with a flapping wing, drawn with a proper sprite
 - Pipes with caps and shading, redrawn only where they changed
 - Score and best score in a bar along the top
@@ -38,7 +39,7 @@ Each press is one flap. Holding the key does nothing extra.
 Two settings sit at the top of the file:
 
 ```python
-SPD=2000;MS=1
+SPD=800;MS=1
 ```
 
 | Setting | What it does |

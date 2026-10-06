@@ -27,6 +27,10 @@ A Pac-Man style arcade game written in MicroPython for the Casio fx-CG100.
 - Extra life at 10,000 points
 - Endless levels, getting harder as you go
 
+## Branding
+
+The side panel carries the **tobias-jermain / CG100-Tools** badge, matching the repo card.
+
 ## Tuning the speed
 
 Near the top of the file is the `SPD` setting:

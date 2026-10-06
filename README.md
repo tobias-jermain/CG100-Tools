@@ -25,6 +25,7 @@
 | [🌾 **Golden Realm**](goldenrealm/description.md) | 🎮 Game | Cozy farming speedrun through golden fields and green valleys, with wind, smoke and butterflies |
 | [🧱 **Tetris**](tetris/description.md) | 🎮 Game | Classic Tetris with ghost piece, next preview, wall kicks and levels |
 | [⚡ **Circuit Solver**](circuitsolver/description.md) | 🛠️ Tool | Build DC circuits and get every current, voltage and power as exact fractions, with animated current flow |
+| [🎬 **Video Player**](video/description.md) | 🛠️ Tool | Plays short, blocky colour clips made from a GIF with the included PC converter |
 | [🧩 **Template**](template/description.md) | 🛠️ Starter | Blank starting point for a new program: copy it and rename |
 
 Each program has its own folder containing the code and a `description.md` that explains what it does and how to use it.
@@ -58,6 +59,9 @@ CG100-Tools/
 │   └── description.md
 └── circuitsolver/
     ├── circuitsolver.py
+└── video/
+    ├── video.py
+    ├── mkvideo.py
     └── description.md
 ```
 

@@ -1,15 +1,15 @@
 # FLAPPY BIRD for Casio fx-CG100 (MicroPython 1.9.4, casioplot)
-# EXE/UP = flap, DOWN = pause, AC = quit. SPD = extra delay per frame,
+# EXE/UP = flap, DOWN = pause, AC = quit. SPD = extra delay per frame (0 = fastest),
 # MS = move pipes/ground every MS frames (2-3 = faster, but steppier).
 from casioplot import *
 from random import randint
-SPD=800;MS=1
+SPD=0;MS=1
 W=384;H=192;GY=172;HY=16;CW=28;CH=10;BX=80;BW=18;BT=11;SP=150;GS=20
 SKY=(78,192,202);WH=(255,255,255);NV=(30,40,80);RD=(224,62,32)
 PO=(84,56,71);PL=(160,224,70);PM=(116,190,45);PD=(84,150,30)
 BU=(92,170,60);BL=(130,215,80);CLD=(240,252,250)
 GL=(150,220,70);GD=(100,175,45);DT=(222,216,149);DL=(250,245,190)
-FK=(95,14);G=7;FL=-84;VM=112;PX=122;PY=44;PW=140;PH=72
+HYS=HY<<4;FK=(95,14);G=7;FL=-84;VM=112;PX=122;PY=44;PW=140;PH=72
 BP={'K':PO,'Y':(247,216,66),'W':WH,'R':RD,'B':(250,238,190),'O':(240,150,40)}
 BR=(
 "....KKKKKK........","..KKYYYYYKKKKK....",".KYYYYYYYKWWWWK...","KYYYYYYYYKWWKKK...",
@@ -18,7 +18,7 @@ BR=(
 WG=(".KKKKKK...........",".KOOOOK...........","..KKKK............")
 WF=(1,0,1,2)
 class Z:pass
-z=Z();z.hi=0;z.hd=0;z.pn=0;z.oy=90;z.pp=[];z.go=0
+z=Z();z.hi=0;z.hd=0;z.tv=0;z.tt=[];z.pn=0;z.oy=90;z.pp=[];z.go=0
 def bs(t):
   g=[]
   for j in range(BT):
@@ -31,9 +31,15 @@ def bs(t):
   r=[]
   for j in range(BT):
     for i in range(BW):
-      if g[j][i]!=0:r.append((i,j,g[j][i]))
+      if g[j][i]!=0:r.append((BX+i,j,g[j][i]))
   return r
 BS=[bs(2),bs(4),bs(6)]
+LO=[];HI=[]
+for j in range(BT):
+  a=0;b=BW
+  while BR[j][a]=='.':a+=1
+  while BR[j][b-1]=='.':b-=1
+  LO.append(BX+a);HI.append(BX+b)
 def isq(n):
   r=0
   while (r+1)*(r+1)<=n:r+=1
@@ -48,57 +54,96 @@ for cx,b in ((50,64),(150,46),(250,72),(340,52)):
         e=x-cx-dx;t=b-isq(r*r-e*e)
         if CT[x]==0 or t<CT[x]:CT[x]=t;CB[x]=b
 def mx(a,b):return a if a>b else b
+BM=0;BL2=0
+for x in range(BX,BX+BW):
+  if BH[x]>BM:BM=BH[x]
+  if CT[x]:BL2=1
 def rc(x,y,w,h,c):
   for i in range(w):
     for j in range(h):set_pixel(x+i,y+j,c)
 def dly(n):
   for i in range(n):pass
-def bgl(x):
-  t=GY-BH[x];c=CT[x]
-  s=[(HY,c,SKY),(c,CB[x],CLD),(CB[x],t,SKY)] if c else [(HY,t,SKY)]
-  return s+[(t,t+2,BL),(t+2,GY,BU)]
-def bgs(x,a,b):
-  r=[]
-  for s,e,c in bgl(x):
-    s=mx(s,a);e=min(e,b)
-    if e>s:r.append((s,e,c))
-  return r
-def cap(a,e):
-  return [(a,a+CH,PO)] if e else [(a,a+1,PO),(a+1,a+3,PL),(a+3,a+7,PM),(a+7,a+9,PD),(a+9,a+10,PO)]
-def cs(x,p,g):
-  c=x-p[0];t=p[1];b=t+p[2]
-  if c<0 or c>=CW:return bgs(x,HY,t)+(bgs(x,t,b) if g else [])+bgs(x,b,GY)
-  e=c==0 or c==CW-1;k=PO if c==1 or c==CW-2 else PM
-  s=(bgs(x,HY,t-CH) if e else [(HY,t-CH,k)])+cap(t-CH,e)
-  if g:s+=bgs(x,t,b)
-  return s+cap(b,e)+(bgs(x,b+CH,GY) if e else [(b+CH,GY,k)])
-def pa(x,s,y0,y1):
-  for a,b,c in s:
-    for y in range(mx(a,y0),min(b,y1)):set_pixel(x,y,c)
+BC=(0,PO,PM);CP=(PO,PL,PL,PM,PM,PM,PM,PD,PD,PO)
+def bgv(x,a,b,sp=set_pixel):
+  t=GY-BH[x];c=CT[x];d=CB[x]
+  if c==0:c=d=t
+  for y in range(a,b if b<c else c):sp(x,y,SKY)
+  for y in range(a if a>c else c,b if b<d else d):sp(x,y,CLD)
+  for y in range(a if a>d else d,b if b<t else t):sp(x,y,SKY)
+  for y in range(a if a>t else t,b if b<t+2 else t+2):sp(x,y,BL)
+  for y in range(a if a>t+2 else t+2,b if b<GY else GY):sp(x,y,BU)
 def col(x,y0,y1):
-  s=None
   for p in z.pp:
-    if 0<=x-p[0]<CW:s=cs(x,p,1)
-  pa(x,s if s else bgs(x,HY,GY),y0,y1)
+    c=x-p[0]
+    if c>=0 and c<CW:
+      t=p[1];b=t+p[2];ed=c==0 or c==CW-1;k=PO if c==1 or c==CW-2 else PM
+      for a,e,m in ((HY,t-CH,1),(t-CH,t,2),(t,b,0),(b,b+CH,3),(b+CH,GY,1)):
+        if a<y0:a=y0
+        if e>y1:e=y1
+        if e>a:
+          if m==0 or (m==1 and ed):bgv(x,a,e)
+          elif m==1:
+            for y in range(a,e):set_pixel(x,y,k)
+          else:
+            for y in range(a,e):set_pixel(x,y,PO if ed else CP[y-(t-CH if m==2 else b)])
+      return
+  bgv(x,y0,y1)
 def rest(x0,x1,y0,y1):
   for x in range(x0,x1):col(x,y0,y1)
-def kc(c):return -1 if c<0 or c>=CW else c if c<2 or c>=CW-2 else 2
-def mv(v):
+def mkt(v):
+  L=[]
+  for c in range(CW+v):
+    d=c-v
+    bn=0 if c<1 or c>=CW-1 else 1 if c==1 or c==CW-2 else 2
+    bo=0 if d<1 or d>=CW-1 else 1 if d==1 or d==CW-2 else 2
+    cn=0 if c>=CW else 1 if c==0 or c==CW-1 else 2
+    co=0 if d<0 or d>=CW else 1 if d==0 or d==CW-1 else 2
+    if bn!=bo or cn!=co:L.append((c,bn if bn!=bo else -1,cn if cn!=co else -1))
+  return L
+def mv(v,sp=set_pixel):
+  if z.tv!=v:z.tt=mkt(v);z.tv=v
   for p in z.pp:
-    xo=p[0];xn=xo-v;p[0]=xn
-    for x in range(mx(0,xn),min(W,xo+CW)):
-      if kc(x-xn)!=kc(x-xo):pa(x,cs(x,p,0),0,H)
-def gnd(o,s):
+    xn=p[0]-v;p[0]=xn;t=p[1]-CH;b=p[1]+p[2]
+    for c,bn,cn in z.tt:
+      x=xn+c
+      if x<0 or x>=W:continue
+      if bn>0:
+        k=PO if bn<2 else PM
+        for y in range(HY,t):sp(x,y,k)
+        for y in range(b+CH,GY):sp(x,y,k)
+      elif bn==0:bgv(x,HY,t);bgv(x,b+CH,GY)
+      if cn>1:
+        for i in range(CH):k=CP[i];sp(x,t+i,k);sp(x,b+i,k)
+      elif cn==1:
+        for y in range(t,t+CH):sp(x,y,PO)
+        for y in range(b,b+CH):sp(x,y,PO)
+      elif cn==0:bgv(x,t,t+CH);bgv(x,b,b+CH)
+def gnd(o,s,sp=set_pixel):
   for x0 in range(-(o%GS),W+GS,GS):
-    for x in range(mx(0,x0-s),min(W,x0)):rc(x,GY+1,1,4,GD if (x+o+s)%(2*GS)>=GS else GL)
+    k=GD if (x0+o)%(2*GS)>=GS else GL
+    for x in range(x0-s if x0>s else 0,x0 if x0<W else W):
+      sp(x,GY+1,k);sp(x,GY+2,k);sp(x,GY+3,k);sp(x,GY+4,k)
 def hs(e):
   if e:rc(2,2,100,12,NV)
   draw_string(6,3,"SCORE "+str(z.s),WH,"small")
   if e:rc(284,2,98,12,NV)
   draw_string(288,3,"BEST "+str(z.hi),WH,"small")
-def drawb():
-  by=z.y>>4;rest(BX,BX+BW,z.oy,z.oy+BT);z.oy=by
-  for i,j,c in BS[WF[(z.t>>1)&3]]:set_pixel(BX+i,by+j,c)
+def drawb(sp=set_pixel):
+  by=z.y>>4;oy=z.oy;h=by-oy;z.oy=by
+  tp=by if by<oy else oy;bm=(by if by>oy else oy)+BT;sl=BL2 or bm>GY-BM
+  for p in z.pp:
+    if p[0]<BX+BW and p[0]+CW>BX and (tp<p[1] or bm>p[1]+p[2]):sl=1
+  if sl:rest(BX,BX+BW,oy,oy+BT)
+  elif h:
+    for j in range(BT):
+      a=LO[j];b=HI[j];r=oy+j;j2=j-h
+      if j2>=0 and j2<BT:
+        c=LO[j2];d=HI[j2]
+        for x in range(a,b if b<c else c):sp(x,r,SKY)
+        for x in range(a if a>d else d,b):sp(x,r,SKY)
+      else:
+        for x in range(a,b):sp(x,r,SKY)
+  for x,j,c in BS[WF[(z.t>>1)&3]]:sp(x,by+j,c)
   show_screen()
 def spawn():
   g=mx(46,62-2*(z.s>>2));lo=HY+CH+10;hi=GY-g-CH-10
@@ -132,8 +177,10 @@ def play():
     if f and not z.fp:z.vy=FL
     z.fp=f
     if k==34:pause()
-    z.vy=min(z.vy+G,VM);z.y=mx(z.y+z.vy,HY<<4)
-    if z.y==HY<<4 and z.vy<0:z.vy=0
+    v=z.vy+G;z.vy=v if v<VM else VM;y=z.y+z.vy
+    if y<HYS:y=HYS
+    if y==HYS and z.vy<0:z.vy=0
+    z.y=y
     if z.t%MS==0:v=z.v*MS;mv(v);gnd(z.go,v);z.go+=v
     if not z.pp or z.pp[-1][0]<=W-SP:spawn()
     if z.pp[0][0]+CW<=0:
@@ -170,10 +217,7 @@ def over():
   while getkey() in FK:pass
   while getkey() not in FK:pass
 clear_screen()
-for x in range(W):
-  for a,b,c in bgs(x,HY,GY):
-    if c!=SKY or SKY!=WH:
-      for y in range(a,b):set_pixel(x,y,c)
+for x in range(W):bgv(x,HY,GY)
 rc(0,0,W,HY,NV);rc(0,GY,W,1,PO);rc(0,GY+5,W,1,DL);rc(0,GY+6,W,H-GY-6,DT)
 for x in range(W):rc(x,GY+1,1,4,GD if x%(2*GS)>=GS else GL)
 while 1:

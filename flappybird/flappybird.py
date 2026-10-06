@@ -1,14 +1,13 @@
 # FLAPPY BIRD for Casio fx-CG100 (MicroPython 1.9.4, casioplot)
 # EXE/UP = flap, DOWN = pause, AC = quit. SPD = extra delay per frame,
 # MS = move pipes/ground every MS frames (2-3 = faster, but steppier).
-# Y1,Y2 = where the blue sky fades to white (set both to GY for a full blue sky, slower to load).
 from casioplot import *
 from random import randint
-SPD=2000;MS=1
+SPD=800;MS=1
 W=384;H=192;GY=172;HY=16;CW=28;CH=10;BX=80;BW=18;BT=11;SP=150;GS=20
-SKY=(78,192,202);SK2=(168,224,230);Y1=32;Y2=44;WH=(255,255,255);NV=(30,40,80);RD=(224,62,32)
+SKY=(78,192,202);WH=(255,255,255);NV=(30,40,80);RD=(224,62,32)
 PO=(84,56,71);PL=(160,224,70);PM=(116,190,45);PD=(84,150,30)
-BU=(92,170,60);BL=(130,215,80);CLD=(250,252,252)
+BU=(92,170,60);BL=(130,215,80);CLD=(240,252,250)
 GL=(150,220,70);GD=(100,175,45);DT=(222,216,149);DL=(250,245,190)
 FK=(95,14);G=7;FL=-84;VM=112;PX=122;PY=44;PW=140;PH=72
 BP={'K':PO,'Y':(247,216,66),'W':WH,'R':RD,'B':(250,238,190),'O':(240,150,40)}
@@ -42,7 +41,7 @@ def isq(n):
 BH=[];CT=[];CB=[];T=[]
 for x in range(32):d=x-16;T.append(4+((isq(256-d*d)*3)>>3))
 for x in range(W):BH.append(T[x%32]);CT.append(0);CB.append(0)
-for cx,b in ((50,40),(150,31),(250,42),(340,34)):
+for cx,b in ((50,64),(150,46),(250,72),(340,52)):
   for dx,r in ((-14,10),(0,14),(14,10)):
     for x in range(cx+dx-r,cx+dx+r+1):
       if x>=0 and x<W:
@@ -54,15 +53,9 @@ def rc(x,y,w,h,c):
     for j in range(h):set_pixel(x+i,y+j,c)
 def dly(n):
   for i in range(n):pass
-def sk(a,b):
-  r=[]
-  for s,e,c in ((HY,Y1,SKY),(Y1,Y2,SK2),(Y2,GY,WH)):
-    s=mx(s,a);e=min(e,b)
-    if e>s:r.append((s,e,c))
-  return r
 def bgl(x):
   t=GY-BH[x];c=CT[x]
-  s=sk(HY,c)+[(c,CB[x],CLD)]+sk(CB[x],t) if c else sk(HY,t)
+  s=[(HY,c,SKY),(c,CB[x],CLD),(CB[x],t,SKY)] if c else [(HY,t,SKY)]
   return s+[(t,t+2,BL),(t+2,GY,BU)]
 def bgs(x,a,b):
   r=[]
@@ -127,7 +120,7 @@ def bdg(x,y):
   for a,b,w,h in ((0,0,100,1),(0,23,100,1),(0,0,1,24),(99,0,1,24),(100,2,2,24),(2,24,100,2)):rc(x+a,y+b,w,h,PO)
   rc(x+1,y+1,98,22,WH);draw_string(x+5,y+3,"tobias-jermain",PO,"small");draw_string(x+5,y+13,"/ CG100-Tools",(0,102,204),"small")
 def ready():
-  draw_string(139,29,"FLAPPY BIRD",WH);draw_string(138,28,"FLAPPY BIRD",NV)
+  draw_string(139,29,"FLAPPY BIRD",PO);draw_string(138,28,"FLAPPY BIRD",WH)
   draw_string(125,56,"EXE / UP : FLAP",PO,"small");draw_string(125,68,"DOWN : PAUSE",PO,"small");bdg(140,86)
   while 1:
     z.t+=1;z.y=(84+abs(z.t%32-16))<<4;drawb();dly(SPD)
@@ -179,7 +172,7 @@ def over():
 clear_screen()
 for x in range(W):
   for a,b,c in bgs(x,HY,GY):
-    if c!=WH:
+    if c!=SKY or SKY!=WH:
       for y in range(a,b):set_pixel(x,y,c)
 rc(0,0,W,HY,NV);rc(0,GY,W,1,PO);rc(0,GY+5,W,1,DL);rc(0,GY+6,W,H-GY-6,DT)
 for x in range(W):rc(x,GY+1,1,4,GD if x%(2*GS)>=GS else GL)

@@ -21,8 +21,7 @@ Each press is one flap. Holding the key does nothing extra.
 
 ## Features
 
-- Sky that fades from blue to white, clouds, rolling bush hills and a scrolling striped ground
-- Loads about 2.5x faster than the first version (30,820 pixel writes before the first frame, down from 76,648)
+- Coloured sky, clouds, rolling bush hills and a scrolling striped ground
 - Title screen carries the **tobias-jermain / CG100-Tools** badge
 - Animated bird with a flapping wing, drawn with a proper sprite
 - Pipes with caps and shading, redrawn only where they changed
@@ -40,14 +39,13 @@ Each press is one flap. Holding the key does nothing extra.
 Two settings sit at the top of the file:
 
 ```python
-SPD=2000;MS=1
+SPD=800;MS=1
 ```
 
 | Setting | What it does |
 |---|---|
 | `SPD` | Extra delay added every frame. Bigger is slower, `0` is no extra delay. |
 | `MS` | Moves the pipes and ground every `MS` frames instead of every frame. `2` or `3` is lighter on the calculator but looks steppier. |
-| `Y1`, `Y2` | Rows where the sky changes from blue to light blue to white. White needs no drawing, so a smaller blue area means a faster start. Set both to `GY` for a full blue sky, which loads about 2.5x slower. |
 
 Flappy Bird redraws more of the screen each frame than PAC-MAN does. On a PC simulation it wrote about 2,000–3,000 pixels per frame, against about 500 for PAC-MAN. If it feels choppy, try `SPD=0` and then `MS=2`. If it is too fast, raise `SPD`. These values have not been tested on a real calculator, so adjust them to suit yours.
 

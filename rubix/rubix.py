@@ -13,6 +13,8 @@ CS=(256,247,222,181,128,66,0);CX=100;CY=88   # cos of 0,15..90 degrees (x256), c
 PA=CO+((0,0,0),)   # colour numbers: 0-5 sticker colours, 6 black
 YR={"F":"R","R":"B","B":"L","L":"F"}   # turn the cube a quarter about U: slot FR -> RB -> BL -> LF
 IT=("U","R","F","D","L","B","MIX","SOLVE","RESET","HOME")
+HT=("LEFT / RIGHT   pick a menu item","UP or EXE   turn clockwise, or do it","DOWN   turn anticlockwise",   # HOW TO page
+  "MIX scrambles, SOLVE works it out and plays it","EXE during a solve skips to the end","HOME goes back here","Time your own solves with RUBIXTIMER.PY")
 HM=(("3X3 CUBE","Scramble, turn and solve",2),("2X2 CUBE","The pocket cube",1),("HOW TO","Controls and tips",5))
 SN=("CROSS","1ST LAYER","2ND LAYER","EDGE FLIP","CORNER TWIST","CORNER SWAP","EDGE SWAP")
 class Z:pass
@@ -238,8 +240,7 @@ def keys():
 def play():
   z.ms=z.sol;z.mi=0;sk=0
   for m,si in z.ms:
-    z.st=si;z.mi+=1
-    if not sk:info()
+    z.st=si;z.mi+=1;info() if not sk else 0
     k=getkey();sk=sk or (k==95 and z.lk!=95);z.lk=k   # a new EXE press skips to the end
     turn(m,1-sk)
   z.msg="SOLVED IN "+str(len(z.ms))+" MOVES" if done() else z.msg;scr()
@@ -277,7 +278,7 @@ def hdraw():
   foot("UP/DOWN  EXE OPEN");cube()
 def help():
   clear_screen();draw_string(16,6,"HOW TO",TX,"large");stripe(16,30)
-  for i,t in enumerate("LEFT / RIGHT   pick a menu item|UP or EXE   turn clockwise, or do it|DOWN   turn anticlockwise|MIX scrambles, SOLVE works it out and plays it|EXE during a solve skips to the end|HOME goes back here|Time your own solves with RUBIXTIMER.PY".split("|")):draw_string(16,42+i*17,t,TX,"small")
+  for i,t in enumerate(HT):draw_string(16,42+i*17,t,TX,"small")
   foot("EXE  BACK");show_screen();keys()
 def home():   # home menu; the cube turns R U R' U' while you choose
   hdraw();t=0;j=0
@@ -295,5 +296,4 @@ def home():   # home menu; the cube turns R U R' U' while you choose
 clear_screen();draw_string(150,86,"LOADING...",BK);show_screen();build(3)
 while 1:
   n=home();card(z.hm,1);draw_string(300,72+z.hm*38,"LOADING",HL,"small");show_screen()
-  if n!=z.n:build(n)
-  z.C=list(z.F);z.sel=0;z.ms=[];z.st=-1;z.msg="";run()
+  build(n) if n!=z.n else 0;z.C=list(z.F);z.sel=0;z.ms=[];z.st=-1;z.msg="";run()
